@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI News Research Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=6">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="{{ url_for('index') }}" aria-label="AI News Research Tool home">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span>
+          </span>
+          <span>
+            <strong>NewsIntel</strong>
+            <small>AI research console</small>
+          </span>
+        </a>
+
+        <nav class="side-nav" aria-label="Dashboard sections">
+          <a href="#research">Research</a>
+          <a href="#briefing">Briefing</a>
+          <a href="#sources">Sources</a>
+        </nav>
+
+        <section class="stat-block">
+          <p class="eyebrow">Workspace</p>
+          <strong>{{ total_searches }}</strong>
+          <span>Total searches completed</span>
+        </section>
+
+        <section class="sidebar-section">
+          <div class="section-title">
+            <span>Recent Queries</span>
+            <i aria-hidden="true"></i>
+          </div>
+          {% if history %}
+            <ul class="history-list">
+              {% for item in history[-5:]|reverse %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="muted">No searches yet.</p>
+          {% endif %}
+        </section>
+
+        <section class="signal-card" aria-label="System status">
+          <div class="signal-head">
+            <span></span>
+            <strong>Pipeline Ready</strong>
+          </div>
+          <div class="signal-grid">
+            <span>NewsAPI</span>
+            <span>Groq</span>
+            <span>LangChain</span>
+            <span>Flask</span>
+          </div>
+        </section>
+
+        <form action="{{ url_for('clear_history') }}" method="post">
+          <button class="secondary-button" type="submit">Clear History</button>
+        </form>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">AI News Desk</p>
+            <h1>AI News Research Tool</h1>
+          </div>
+          <div class="status-pill">
+            <span aria-hidden="true"></span>
+            Live system
+          </div>
+        </header>
+
+        <section class="hero-console" id="research">
+          <img class="hero-image" src="{{ url_for('static', filename='images/intelligence-command-center.png') }}" alt="Futuristic news intelligence command center">
+          <div class="hero-overlay"></div>
+
+          <div class="hero-copy">
+            <p class="eyebrow">Intelligence Briefing Engine</p>
+            <h2>Search news and read it in your language.</h2>
+            <p>Enter a topic, choose a language, generate an AI summary, and export the result as a report.</p>
+
+            <form class="search-form" action="{{ url_for('search') }}" method="post">
+              <div class="topic-field">
+                <label for="query">Research topic</label>
+                <input id="query" name="query" type="text" value="{{ query }}" placeholder="Example: Artificial Intelligence" autofocus>
+              </div>
+
+              <div class="language-row">
+                <label class="language-field" for="target_language">
+                  <span>Translate briefing into</span>
+                  <select id="target_language" name="target_language">
+                    {% for language, label in language_options %}
+                      <option value="{{ language }}" {% if selected_language == language %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <button class="primary-button" type="submit">
+                  <span>Generate Summary</span>
+                </button>
+              </div>
+              <div class="quick-topics" aria-label="Suggested topics">
+                <button type="button" data-topic="Artificial Intelligence">Artificial Intelligence</button>
+                <button type="button" data-topic="Global Markets">Global Markets</button>
+                <button type="button" data-topic="Climate Technology">Climate Technology</button>
+              </div>
+            </form>
+          </div>
+
+        </section>
+
+        {% if error %}
+          <div class="alert">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+          <section class="result">
+            <div class="success">
+              <span aria-hidden="true"></span>
+              AI Summary Generated Successfully
+            </div>
+
+            <div class="metrics" aria-label="Summary metrics">
+              <article>
+                <span>Articles Found</span>
+                <strong>{{ result.articles_found }}</strong>
+              </article>
+              <article>
+                <span>Processing Time</span>
+                <strong>{{ result.processing_time }} sec</strong>
+              </article>
+              <article>
+                <span>Generated At</span>
+                <strong>{{ result.generated_at }}</strong>
+              </article>
+              <article>
+                <span>Language</span>
+                <strong>{{ result.language }}</strong>
+              </article>
+            </div>
+
+            <section class="panel summary-panel" id="briefing">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Briefing</p>
+                  <h2>AI Summary</h2>
+                </div>
+                <span class="panel-tag">{{ result.language }}</span>
+              </div>
+              <div class="summary">{{ result.summary }}</div>
+            </section>
+
+            <section class="panel export-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Exports</p>
+                  <h2>Download Report</h2>
+                </div>
+              </div>
+              <div class="download-row">
+                <a class="download-button" href="{{ url_for('download_report', filename=result.txt_file) }}">TXT Report</a>
+                <a class="download-button" href="{{ url_for('download_report', filename=result.md_file) }}">Markdown Report</a>
+              </div>
+            </section>
+
+            <section class="panel" id="sources">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Sources</p>
+                  <h2>Retrieved Articles</h2>
+                </div>
+                <span class="panel-tag">{{ result.articles_found }} sources</span>
+              </div>
+              {% if result.articles %}
+                <div class="article-list">
+                  {% for article in result.articles %}
+                    <details class="article">
+                      <summary>
+                        <span>Source {{ loop.index }}</span>
+                        <strong>{{ article.title }}</strong>
+                      </summary>
+                      <dl>
+                        <dt>Publisher</dt>
+                        <dd>{{ article.source }}</dd>
+                        <dt>Description</dt>
+                        <dd>{{ article.description }}</dd>
+                      </dl>
+                      <a href="{{ article.url }}" target="_blank" rel="noreferrer">Open original article</a>
+                    </details>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="muted">No articles found.</p>
+              {% endif %}
+            </section>
+          </section>
+        {% endif %}
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}?v=1"></script>
+  </body>
+</html>
