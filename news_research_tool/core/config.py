@@ -40,14 +40,12 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
 
-# Validate Groq API key
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY is missing in .env file")
+def require_env(value: str, name: str) -> str:
+    """Return an env value or raise a clear runtime error."""
+    if value:
+        return value
 
-
-# Validate News API key
-if not NEWS_API_KEY:
-    raise ValueError("NEWS_API_KEY is missing in .env file")
+    raise RuntimeError(f"{name} is missing. Add it in your environment variables.")
 
 
 # Initialize Groq LLM
@@ -55,8 +53,9 @@ if not NEWS_API_KEY:
 # - Fast
 # - Good summarization
 # - Cost efficient
-llm = ChatGroq(
-    groq_api_key=GROQ_API_KEY,
-    model_name="llama-3.1-8b-instant",
-    temperature=0.3
-)
+def get_llm() -> ChatGroq:
+    return ChatGroq(
+        groq_api_key=require_env(GROQ_API_KEY, "GROQ_API_KEY"),
+        model_name="llama-3.1-8b-instant",
+        temperature=0.3
+    )

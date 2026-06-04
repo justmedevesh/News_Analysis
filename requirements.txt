@@ -1,10 +1,6 @@
 langchain
-langchain-community
 langchain-groq
 flask
 newsapi-python
 python-dotenv
-pandas
-tiktoken
 requests
-groq

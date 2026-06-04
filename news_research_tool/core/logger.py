@@ -22,34 +22,44 @@ Production applications need logs to:
 
 # Import logging module
 import logging
+import sys
 
 from news_research_tool.core.paths import LOGS_DIR
 
 
-# Create logs folder automatically
-LOGS_DIR.mkdir(exist_ok=True)
-
-
-# Configure logger
-logging.basicConfig(
-
-    # Log file location
-    filename=str(LOGS_DIR / "app.log"),
-
-    # Append mode
-    filemode="a",
-
-    # Log format
-    format="""
+LOG_FORMAT = """
 %(asctime)s
 %(levelname)s
 %(message)s
 ------------------------
-""",
+"""
 
-    # Logging level
-    level=logging.INFO
-)
+
+try:
+    # Create logs folder automatically
+    LOGS_DIR.mkdir(exist_ok=True)
+
+    # Configure logger
+    logging.basicConfig(
+
+        # Log file location
+        filename=str(LOGS_DIR / "app.log"),
+
+        # Append mode
+        filemode="a",
+
+        # Log format
+        format=LOG_FORMAT,
+
+        # Logging level
+        level=logging.INFO
+    )
+except OSError:
+    logging.basicConfig(
+        stream=sys.stdout,
+        format=LOG_FORMAT,
+        level=logging.INFO
+    )
 
 
 # Create reusable logger

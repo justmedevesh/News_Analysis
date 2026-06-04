@@ -30,17 +30,13 @@ from newsapi import NewsApiClient
 from news_research_tool.core.logger import logger
 
 # Import API key from config
-from news_research_tool.core.config import NEWS_API_KEY
+from news_research_tool.core.config import NEWS_API_KEY, require_env
 
 # Import requests exception handling
 import requests
 
 # Import typing for better readability
 from typing import List, Dict
-
-
-# Initialize NewsAPI client
-newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
 
 def clean_article(article: Dict) -> Dict:
@@ -146,6 +142,8 @@ def fetch_news(query: str, page_size: int = 10) -> List[Dict]:
 
         logger.info(f"Fetching news for query: {query}")
 
+        newsapi = NewsApiClient(api_key=require_env(NEWS_API_KEY, "NEWS_API_KEY"))
+
         # Fetch news articles
         response = newsapi.get_everything(
             q=query,
@@ -181,7 +179,5 @@ def fetch_news(query: str, page_size: int = 10) -> List[Dict]:
         logger.error(f"Network Error: {error}")
 
     except Exception as error:
-
-        print(f"Unexpected Error: {error}")
-        return []
         logger.error(f"Unexpected Error: {error}")
+        raise

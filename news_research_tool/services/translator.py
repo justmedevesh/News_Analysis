@@ -12,7 +12,7 @@ from typing import Dict, List
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
-from news_research_tool.core.config import llm
+from news_research_tool.core.config import get_llm
 from news_research_tool.core.logger import logger
 
 
@@ -74,7 +74,7 @@ TEXT:
 """,
     )
 
-    chain = prompt | llm | StrOutputParser()
+    chain = prompt | get_llm() | StrOutputParser()
     logger.info(f"Translating summary to {target_language}")
 
     return chain.invoke({
@@ -117,7 +117,7 @@ ARTICLES_JSON:
 """,
     )
 
-    chain = prompt | llm | StrOutputParser()
+    chain = prompt | get_llm() | StrOutputParser()
     logger.info(f"Translating article metadata to {target_language}")
 
     response = chain.invoke({

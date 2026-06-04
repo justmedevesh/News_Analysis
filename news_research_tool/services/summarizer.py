@@ -30,7 +30,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 # Import LLM from config
-from news_research_tool.core.config import llm
+from news_research_tool.core.config import get_llm
 
 # Import logger
 from news_research_tool.core.logger import logger
@@ -163,7 +163,7 @@ def generate_summary(query: str, articles: List[Dict]) -> str:
     parser = StrOutputParser()
 
     # Build LangChain pipeline
-    chain = prompt | llm | parser
+    chain = prompt | get_llm() | parser
 
     logger.info("Generating AI summary")
 

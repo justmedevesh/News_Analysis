@@ -37,6 +37,8 @@ http://127.0.0.1:5001
 ```text
 .
 ├── app.py                         # Flask launcher
+├── api/
+│   └── index.py                   # Vercel serverless entrypoint
 ├── news_research_tool/
 │   ├── web.py                     # Flask routes and page state
 │   ├── core/
@@ -57,5 +59,18 @@ http://127.0.0.1:5001
 ├── tests/                         # Manual test scripts
 ├── reports/                       # Generated reports
 ├── logs/                          # Application logs
+├── vercel.json                    # Vercel routing/config
 └── requirements.txt
 ```
+
+## Deploying On Vercel
+
+Add these environment variables in your Vercel project settings:
+
+```text
+GROQ_API_KEY
+NEWS_API_KEY
+FLASK_SECRET_KEY
+```
+
+The app uses `api/index.py` as the Vercel serverless entrypoint.

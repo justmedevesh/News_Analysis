@@ -10,11 +10,11 @@ This file tests whether:
 """
 
 # Import LLM from config
-from news_research_tool.core.config import llm
+from news_research_tool.core.config import get_llm
 
 
 # Send a simple test prompt
-response = llm.invoke("Say hello")
+response = get_llm().invoke("Say hello")
 
 
 # Print response
