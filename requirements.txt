@@ -4,3 +4,5 @@ flask
 newsapi-python
 python-dotenv
 requests
+gunicorn
+
