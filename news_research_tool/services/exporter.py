@@ -26,7 +26,10 @@ from news_research_tool.core.paths import REPORTS_DIR
 # CREATE REPORTS FOLDER IF MISSING
 # ---------------------------------------------------
 
-REPORTS_DIR.mkdir(exist_ok=True)
+try:
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
 
 
 # ---------------------------------------------------
